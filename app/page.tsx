@@ -1,16 +1,15 @@
 'use client'
 
 import { addPost, getPosts } from './actions'
-// 1. useFormState 대신 useActionState를 react에서 직접 import 합니다.
-import { useActionState, useEffect, useState, useRef } from 'react'
+import { useFormState } from 'react-dom' // 안정적인 'react-dom'에서 useFormState를 가져옵니다.
+import { useEffect, useState, useRef } from 'react'
 
 const initialState = {
   message: ''
 }
 
 export default function Page() {
-  // 2. 훅 이름을 useActionState로 변경합니다.
-  const [state, formAction] = useActionState(addPost, initialState)
+  const [state, formAction] = useFormState(addPost, initialState)
   const [posts, setPosts] = useState<any[]>([])
   const formRef = useRef<HTMLFormElement>(null) // 폼 리셋을 위한 ref
 
@@ -23,7 +22,6 @@ export default function Page() {
 
   // 폼 액션의 결과(state)가 변경될 때마다 실행될 부수 효과를 처리합니다.
   useEffect(() => {
-    // 3. 옵셔널 체이닝(?.)을 사용하여 state와 message 속성의 존재를 안전하게 확인합니다.
     if (state?.message === '게시글이 성공적으로 저장되었습니다.') {
       // 글 목록을 새로고침합니다.
       getPosts().then((newPosts) => {
@@ -44,7 +42,6 @@ export default function Page() {
       <main className="max-w-4xl mx-auto py-8 px-4">
         <div className="bg-white p-6 rounded-lg shadow-md mb-8">
           <h2 className="text-2xl font-semibold mb-4">새 글 작성</h2>
-          {/* 폼에 ref를 연결합니다. */}
           <form action={formAction} ref={formRef}>
             <div className="mb-4">
               <label htmlFor="title" className="block text-sm font-medium text-gray-700">제목</label>
@@ -73,9 +70,9 @@ export default function Page() {
               저장
             </button>
           </form>
-          {/* 4. alert() 대신 상태 메시지를 UI에 직접 표시합니다. */}
+          {/* 서버에서 받은 메시지를 UI에 직접 표시합니다. */}
           {state?.message && (
-              <p className={`mt-4 text-sm ${state.message.includes('실패') ? 'text-red-600' : 'text-green-600'}`}>
+              <p className={`mt-4 text-sm font-semibold ${state.message.includes('실패') || state.message.includes('오류') ? 'text-red-600' : 'text-green-600'}`}>
                 {state.message}
               </p>
           )}
